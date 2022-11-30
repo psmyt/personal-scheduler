@@ -2,6 +2,9 @@ package ru.personal.scheduler;
 
 import org.junit.Assert;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import static ru.personal.scheduler.time.utils.TimeUtils.*;
 import java.util.*;
 
 public class Interval {
@@ -33,7 +36,7 @@ public class Interval {
 
     @Override
     public boolean equals(Object interval) {
-        if (!(interval instanceof Interval)) throw new IllegalArgumentException(interval + " is not type Interval");
+        if (!(interval instanceof Interval)) throw new IllegalArgumentException(interval + " is not an instance of Interval");
         return this.startTime.equals(((Interval) interval).startTime)
                 && this.endTime.equals(((Interval) interval).endTime);
     }
@@ -42,11 +45,17 @@ public class Interval {
         return this.startTime;
     }
 
+    public Interval truncToLocalDate() {
+        return Interval.between(
+                localStartOfTheDayTimeStamp(this.startTime),
+                localStartOfTheDayTimeStamp(this.endTime));
+    }
+
     public Instant getEndTime() {
         return this.endTime;
     }
 
-    public long length() {
+    public long lengthInSeconds() {
         return this.endTime.getEpochSecond() - this.startTime.getEpochSecond();
     }
 
@@ -67,7 +76,7 @@ public class Interval {
                 this.startTime,
                 this.endTime};
         Arrays.sort(allTimePoints, Instant::compareTo);
-        if (Interval.between(allTimePoints[0], allTimePoints[3]).length() > interval.length() + this.length()) {
+        if (Interval.between(allTimePoints[0], allTimePoints[3]).lengthInSeconds() > interval.lengthInSeconds() + this.lengthInSeconds()) {
             throw new IllegalArgumentException(String.format("intervals %s and %s do not intersect or touch at any point",
                     this, interval));
         }

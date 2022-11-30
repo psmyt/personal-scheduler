@@ -1,16 +1,26 @@
 package ru.personal.scheduler.view;
 
 import javafx.scene.Group;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import javafx.util.Pair;
+import org.junit.Assert;
 import ru.personal.scheduler.Interval;
+import ru.personal.scheduler.dto.Scheduled;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static ru.personal.scheduler.time.utils.TimeUtils.*;
 
 public class ScheduleTable extends StackPane {
     private static final Map<Integer, String> hourDictionary = getHourDictionary();
@@ -44,52 +54,118 @@ public class ScheduleTable extends StackPane {
         return dictionary;
     }
 
+    private Interval scope;
+
     private static final int DEFAULT_SCHEDULE_WIDTH = 1000;
     private static final int DEFAULT_SCHEDULE_HEIGHT = 700;
-
-    private static final long DEFAULT_SCHEDULE_SCOPE_LENGTH =
-            7 * 24 * 60 * 60;
-    private long scheduleScopeLength = DEFAULT_SCHEDULE_SCOPE_LENGTH;
     private int scheduleWidth = DEFAULT_SCHEDULE_WIDTH;
     private int scheduleHeight = DEFAULT_SCHEDULE_HEIGHT;
 
-    private static Group scheduleContent = new Group();
-    private static final ScheduleTable scheduleTable = new ScheduleTable(scheduleContent);
+    private static Group scheduleRoot = new Group();
+    private static Group scheduleGrid = new Group();
+    private static Group scheduleTexts = new Group();
+    private static Group scheduleContents = new Group();
+    private static final ScheduleTable scheduleTable = new ScheduleTable(scheduleRoot);
+
 
     private ScheduleTable(Group group) {
         super(group);
+        this.scope = calculateDefaultScope();
+    }
+
+    private Interval calculateDefaultScope() {
+        int today = currentDayOfTheWeek() - 1; // number from 0 to 6 represents current day of the week
+        return Interval.between(
+                Instant.ofEpochMilli(System.currentTimeMillis() - (long) today * MILLISECONDS_IN_ONE_DAY),
+                Instant.ofEpochMilli(System.currentTimeMillis() + (long) (7 - today) * MILLISECONDS_IN_ONE_DAY)
+        ).truncToLocalDate();
     }
 
     public static ScheduleTable getInstance() {
         return scheduleTable;
     }
 
-    public Pair<Float, Float> getCoordinatesOfTimePoint(Instant point) {
-
-        return null;
+    public void setScope(Interval newScope) {
+        this.scope = newScope.truncToLocalDate();
     }
 
-    public void redrawSchedule(Interval scope) {
-        this.getChildren().remove(scheduleContent);
-        scheduleContent = new Group();
-        int numOfDays = (int) (scope.length() / (24 * 60 * 60));
-        float columnWidth = (float) scheduleWidth / numOfDays;
-        float columnHeight = (float) scheduleHeight / 24;
-        for (int i = 0; i < numOfDays; i++) {
-            for (int j = 0; j < 24; j++) {
+    public Pair<Float, Float> getUnadjustedCoordinatesOfTimePoint(Instant point) {
+        point = point.truncatedTo(ChronoUnit.SECONDS);
+        Assert.assertTrue(scope.contains(point));
+        var fromScopeBeginningToPoint = Interval.between(scope.getStartTime(), point);
+        float y = fromScopeBeginningToPoint.lengthInSeconds() % SECONDS_IN_ONE_DAY;
+        float x = (fromScopeBeginningToPoint.lengthInSeconds() - y) / SECONDS_IN_ONE_DAY;
+        return new Pair<>(x, y);
+    }
+
+    public void composeContents(List<Scheduled> scheduled, float columnWidth, float columnHeight) {
+        scheduleContents = new Group();
+        float heightPerSec = columnHeight / SECONDS_IN_ONE_DAY;
+        scheduled.forEach(
+                s -> {
+                    Pair<Float, Float> coords = getUnadjustedCoordinatesOfTimePoint(s.getStartDate());
+                    Rectangle rectangle = new Rectangle();
+                    rectangle.setX(coords.getKey() * columnWidth);
+                    rectangle.setY(coords.getValue() * heightPerSec);
+                    rectangle.setWidth(columnWidth - 5);
+                    rectangle.setHeight(
+                            Interval.between(s.getStartDate(), s.getEndDate())
+                                    .lengthInSeconds() * heightPerSec);
+                    rectangle.setFill(Color.RED);
+                    Tooltip tooltip = new Tooltip(s.toString());
+                    tooltip.setShowDelay(Duration.ZERO);
+                    Tooltip.install(rectangle, tooltip);
+                    scheduleContents.getChildren().add(rectangle);
+                }
+        );
+    }
+
+    public void composeGrid(int numOfColumns, int numOfRows, float columnWidth, float hourHeight) {
+        scheduleGrid = new Group();
+        for (int i = 0; i < numOfColumns; i++) {
+            for (int j = 0; j < numOfRows; j++) {
                 Rectangle newRectangle = new Rectangle();
                 newRectangle.setX(i * columnWidth);
-                newRectangle.setY(j * columnHeight);
+                newRectangle.setY(j * hourHeight);
                 newRectangle.setWidth(columnWidth - 5);
-                newRectangle.setHeight(columnHeight - 2);
+                newRectangle.setHeight(hourHeight - 2);
                 newRectangle.setFill(Color.BEIGE);
-                Text text = new Text(String.valueOf(hourDictionary.get(j)));
-                text.setX(i * columnWidth);
-                text.setY(text.getTabSize() + j * columnHeight);
-                scheduleContent.getChildren().add(newRectangle);
-                scheduleContent.getChildren().add(text);
+                scheduleGrid.getChildren().add(newRectangle);
             }
         }
-        this.getChildren().add(scheduleContent);
+    }
+
+    public void composeTexts(int numOfColumns, int numOfRows, float columnWidth, float hourHeight) {
+        scheduleTexts = new Group();
+        for (int i = 0; i < numOfColumns; i++) {
+            String date = Instant.ofEpochSecond(scope.getStartTime().getEpochSecond() + (long) i * SECONDS_IN_ONE_DAY)
+                    .atZone(ZoneId.systemDefault())
+                    .format(DateTimeFormatter.ofPattern("EEEE, '\n'dd MMMM yyyy"));
+            Text dateLabel = new Text(date);
+            dateLabel.setX(i * columnWidth + columnWidth / 4);
+            dateLabel.setY(-20);
+            scheduleTexts.getChildren().add(dateLabel);
+            for (int j = 0; j < numOfRows; j++) {
+                Text hourMark = new Text(String.valueOf(hourDictionary.get(j)));
+                hourMark.setX(i * columnWidth);
+                hourMark.setY(hourMark.getTabSize() + j * hourHeight);
+                scheduleTexts.getChildren().add(hourMark);
+            }
+        }
+    }
+
+    public void redrawSchedule(List<Scheduled> scheduledList) {
+        this.getChildren().remove(scheduleRoot);
+        scheduleRoot = new Group();
+        int numOfDays = (int) scope.lengthInSeconds() / SECONDS_IN_ONE_DAY;
+        float columnWidth = (float) scheduleWidth / numOfDays;
+        float heightOfOneHour = (float) scheduleHeight / 24;
+        composeGrid(numOfDays, 24, columnWidth, heightOfOneHour);
+        scheduleRoot.getChildren().add(scheduleGrid);
+        composeContents(scheduledList, columnWidth, scheduleHeight);
+        scheduleRoot.getChildren().add(scheduleContents);
+        composeTexts(numOfDays, 24, columnWidth, heightOfOneHour);
+        scheduleRoot.getChildren().add(scheduleTexts);
+        this.getChildren().add(scheduleRoot);
     }
 }

@@ -1,18 +1,22 @@
 package ru.personal.scheduler.dto;
 
+import ru.personal.scheduler.Interval;
+import ru.personal.scheduler.time.utils.TimeUtils;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import static ru.personal.scheduler.time.utils.TimeUtils.*;
 
-public class Planned {
+public class Scheduled {
     private UUID id;
     private Instant startDate;
     private Instant endDate;
     private String description;
     private boolean notificationDelivered;
 
-    private Planned(Builder builder) {
+    private Scheduled(Builder builder) {
         this.id = UUID.randomUUID();
         this.startDate = builder.startDate;
         this.endDate = builder.endDate;
@@ -24,6 +28,26 @@ public class Planned {
         return startDate
                 .atZone(ZoneId.systemDefault())
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Событие: %s\n%s - %s\n",
+                description,
+                formatToHourMinute(startDate),
+                formatToHourMinute(endDate));
+    }
+
+    public Instant getStartDate() {
+        return this.startDate;
+    }
+
+    public Interval getTimeWindow() {
+        return Interval.between(this.startDate, this.endDate);
+    }
+
+    public Instant getEndDate() {
+        return this.endDate;
     }
 
     public static Builder Builder(Instant startDate, String description) {
@@ -52,8 +76,8 @@ public class Planned {
             return this;
         }
 
-        public Planned build() {
-            return new Planned(this);
+        public Scheduled build() {
+            return new Scheduled(this);
         }
     }
 }

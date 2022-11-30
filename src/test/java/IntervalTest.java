@@ -26,10 +26,10 @@ public class IntervalTest {
         Instant sixteenHoursAgo = Instant.ofEpochMilli(System.currentTimeMillis() - 16 * 60 * 60 * 1000);
         List<Interval> list = betweenYesterdayAndToday.split(eightHoursAgo, sixteenHoursAgo);
         System.out.println(list);
-        System.out.println(betweenYesterdayAndToday.length());
-        System.out.println(list.stream().mapToLong(Interval::length).sum());
-        Assert.assertEquals(betweenYesterdayAndToday.length(),
-                list.stream().mapToLong(Interval::length).sum());
+        System.out.println(betweenYesterdayAndToday.lengthInSeconds());
+        System.out.println(list.stream().mapToLong(Interval::lengthInSeconds).sum());
+        Assert.assertEquals(betweenYesterdayAndToday.lengthInSeconds(),
+                list.stream().mapToLong(Interval::lengthInSeconds).sum());
     }
 
     @Test
