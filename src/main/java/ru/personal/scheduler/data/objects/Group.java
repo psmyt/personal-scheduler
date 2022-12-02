@@ -1,4 +1,4 @@
-package ru.personal.scheduler.dto;
+package ru.personal.scheduler.data.objects;
 
 public class Group {
     private String id;

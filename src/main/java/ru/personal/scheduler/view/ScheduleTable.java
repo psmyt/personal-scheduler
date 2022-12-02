@@ -10,7 +10,7 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import org.junit.Assert;
 import ru.personal.scheduler.time.utils.Interval;
-import ru.personal.scheduler.dto.Scheduled;
+import ru.personal.scheduler.data.objects.Scheduled;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -154,7 +154,8 @@ public class ScheduleTable extends StackPane {
         }
     }
 
-    public void redrawSchedule(List<Scheduled> scheduledList) {
+    public void redrawSchedule() {
+        List<Scheduled> scheduledList = Scheduled.findWithin(scope);
         this.getChildren().remove(scheduleRoot);
         scheduleRoot = new Group();
         int numOfDays = (int) scope.lengthInSeconds() / SECONDS_IN_ONE_DAY;

@@ -1,34 +1,42 @@
-package ru.personal.scheduler.dto;
+package ru.personal.scheduler.data.objects;
 
+import ru.personal.scheduler.DataSource;
 import ru.personal.scheduler.time.utils.Interval;
-import ru.personal.scheduler.entities.ScheduledEntity;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.UUID;
 
 import static ru.personal.scheduler.time.utils.TimeUtils.*;
 
 public class Scheduled {
+
+    private UUID id;
     private Instant startDate;
     private Instant endDate;
     private String description;
     private boolean notificationDelivered;
 
     private Scheduled(Builder builder) {
+        this.id = UUID.randomUUID();
         this.startDate = builder.startDate;
         this.endDate = builder.endDate;
         this.description = builder.description;
         this.notificationDelivered = builder.notificationDelivered;
     }
 
-    public ScheduledEntity toEntity() {
-        ScheduledEntity entity = new ScheduledEntity();
-        entity.setStartDate(startDate.getEpochSecond());
-        entity.setDescription(description);
-        entity.setEndDate(endDate.getEpochSecond());
-        entity.setNotificationDelivered(notificationDelivered);
-        return entity;
+    public static List<Scheduled> findWithin(Interval scope) {
+//        DataSource.executeSql("select * from scheduled where start_time > ? and end_time < ?",
+//                scope.getStartTime().getEpochSecond(),
+//                scope.getEndTime().getEpochSecond());
+        DataSource.executeSql("select * from scheduled");
+        return null;
     }
 
     public String getStartDay() {
@@ -58,7 +66,7 @@ public class Scheduled {
     }
 
     public static Builder Builder(Instant startDate, String description) {
-        return new Builder(startDate,description);
+        return new Builder(startDate, description);
     }
 
     public static class Builder {

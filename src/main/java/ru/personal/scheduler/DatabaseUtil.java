@@ -6,15 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class SqlConsole {
+public class DatabaseUtil {
     private static final Connection connection;
 
     static {
         try {
             String dbUrl = "jdbc:derby:DerbyDB;create=true";
-//            String dbUrl = "jdbc:derby:memory:demo;create=true";
             connection = DriverManager.getConnection(dbUrl);
             System.out.println("установлено соединение");
+            checkTables();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -22,6 +22,12 @@ public class SqlConsole {
 
     public Connection connection() {
         return connection;
+    }
+
+    private static void checkTables() throws SQLException {
+        connection.createStatement().execute(
+                ""
+        );
     }
 
     public static String executeSqlQuery(CharSequence sql) {

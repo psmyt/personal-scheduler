@@ -6,7 +6,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 
-import static ru.personal.scheduler.SqlConsole.executeSqlQuery;
+import static ru.personal.scheduler.DatabaseUtil.executeSqlQuery;
 
 public class SqlLine extends GridPane {
     private static Group root;
