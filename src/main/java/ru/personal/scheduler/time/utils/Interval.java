@@ -1,9 +1,8 @@
-package ru.personal.scheduler;
+package ru.personal.scheduler.time.utils;
 
 import org.junit.Assert;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
+
 import static ru.personal.scheduler.time.utils.TimeUtils.*;
 import java.util.*;
 

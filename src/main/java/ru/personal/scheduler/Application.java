@@ -21,12 +21,12 @@ public class Application extends javafx.application.Application {
 
     @Override
     public void start(Stage stage) {
-        SqlLine sqlLine = SqlLine.getInstance();
-        Scene sqlScene = new Scene(sqlLine);
-        Stage sqlWindow = new Stage();
-        sqlWindow.setAlwaysOnTop(true);
-        sqlWindow.setScene(sqlScene);
-        sqlWindow.show();
+//        SqlLine sqlLine = SqlLine.getInstance();
+//        Scene sqlScene = new Scene(sqlLine);
+//        Stage sqlWindow = new Stage();
+//        sqlWindow.setAlwaysOnTop(true);
+//        sqlWindow.setScene(sqlScene);
+//        sqlWindow.show();
         ScheduleTable scheduleTable = ScheduleTable.getInstance();
         BorderPane root = new BorderPane(scheduleTable);
         Scene scene = new Scene(root, 1100, 900);

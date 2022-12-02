@@ -1,27 +1,34 @@
 package ru.personal.scheduler.dto;
 
-import ru.personal.scheduler.Interval;
-import ru.personal.scheduler.time.utils.TimeUtils;
+import ru.personal.scheduler.time.utils.Interval;
+import ru.personal.scheduler.entities.ScheduledEntity;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+
 import static ru.personal.scheduler.time.utils.TimeUtils.*;
 
 public class Scheduled {
-    private UUID id;
     private Instant startDate;
     private Instant endDate;
     private String description;
     private boolean notificationDelivered;
 
     private Scheduled(Builder builder) {
-        this.id = UUID.randomUUID();
         this.startDate = builder.startDate;
         this.endDate = builder.endDate;
         this.description = builder.description;
         this.notificationDelivered = builder.notificationDelivered;
+    }
+
+    public ScheduledEntity toEntity() {
+        ScheduledEntity entity = new ScheduledEntity();
+        entity.setStartDate(startDate.getEpochSecond());
+        entity.setDescription(description);
+        entity.setEndDate(endDate.getEpochSecond());
+        entity.setNotificationDelivered(notificationDelivered);
+        return entity;
     }
 
     public String getStartDay() {

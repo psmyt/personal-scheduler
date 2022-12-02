@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class Database {
+public class SqlConsole {
     private static final Connection connection;
 
     static {
@@ -14,6 +14,7 @@ public class Database {
             String dbUrl = "jdbc:derby:DerbyDB;create=true";
 //            String dbUrl = "jdbc:derby:memory:demo;create=true";
             connection = DriverManager.getConnection(dbUrl);
+            System.out.println("установлено соединение");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -21,27 +22,6 @@ public class Database {
 
     public Connection connection() {
         return connection;
-    }
-
-    public static void normalDbUsage() throws SQLException {
-        Statement statement = connection.createStatement();
-        // drop table
-        // stmt.executeUpdate("Drop Table users");
-
-        // create table
-        statement.executeUpdate("Create table users (id int primary key, name varchar(30))");
-
-        // insert 2 rows
-        statement.executeUpdate("insert into users values (1,'tom')");
-        statement.executeUpdate("insert into users values (2,'peter')");
-
-        // query
-        ResultSet rs = statement.executeQuery("SELECT * FROM users");
-
-        // print out query result
-        while (rs.next()) {
-            System.out.printf("%d\t%s\n", rs.getInt("id"), rs.getString("name"));
-        }
     }
 
     public static String executeSqlQuery(CharSequence sql) {

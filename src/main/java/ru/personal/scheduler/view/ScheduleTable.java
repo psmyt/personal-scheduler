@@ -9,7 +9,7 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import org.junit.Assert;
-import ru.personal.scheduler.Interval;
+import ru.personal.scheduler.time.utils.Interval;
 import ru.personal.scheduler.dto.Scheduled;
 
 import java.time.Instant;

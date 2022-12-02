@@ -1,6 +1,6 @@
 import org.junit.Assert;
 import org.junit.Test;
-import ru.personal.scheduler.Interval;
+import ru.personal.scheduler.time.utils.Interval;
 
 import java.time.Instant;
 import java.util.List;
