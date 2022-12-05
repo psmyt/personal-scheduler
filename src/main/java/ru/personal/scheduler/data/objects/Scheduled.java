@@ -1,5 +1,6 @@
 package ru.personal.scheduler.data.objects;
 
+import org.junit.Assert;
 import ru.personal.scheduler.DataSource;
 import ru.personal.scheduler.time.utils.Interval;
 
@@ -58,7 +59,7 @@ public class Scheduled {
     }
 
     public void persist() {
-        if (this.id == null) {
+        if (this.id == 0) {
             insert();
         } else update();
     }
@@ -72,7 +73,7 @@ public class Scheduled {
             statement.setLong(2, this.endDate.getEpochSecond());
             statement.setString(3, this.description);
             statement.setBoolean(4, this.notificationDelivered);
-            statement.executeUpdate();
+            int executionCode = statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -82,7 +83,7 @@ public class Scheduled {
         String sql = "update Scheduled set " +
                 "start_date = ?, " +
                 "end_date = ?, " +
-                "description = ? " +
+                "description = ?, " +
                 "notification_delivered = ? " +
                 "where id = ?";
         try (Connection connection = DataSource.getConnection();
@@ -93,6 +94,18 @@ public class Scheduled {
             statement.setBoolean(4, this.notificationDelivered);
             statement.setLong(5, this.id);
             statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void delete() {
+        String sql = "delete from scheduled where " +
+                "id = ?";
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, this.id);
+            statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

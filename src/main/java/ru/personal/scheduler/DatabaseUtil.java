@@ -14,7 +14,7 @@ public class DatabaseUtil {
             String dbUrl = "jdbc:derby:DerbyDB;create=true";
             connection = DriverManager.getConnection(dbUrl);
             System.out.println("установлено соединение");
-            checkTables();
+//            checkTables();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -33,7 +33,8 @@ public class DatabaseUtil {
     public static String executeSqlQuery(CharSequence sql) {
         try {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(String.valueOf(sql));
+            statement.execute(String.valueOf(sql));
+            ResultSet resultSet = statement.getResultSet();
             int columns = resultSet.getMetaData().getColumnCount();
             StringBuilder stringBuilder =new StringBuilder();
             while(resultSet.next()){

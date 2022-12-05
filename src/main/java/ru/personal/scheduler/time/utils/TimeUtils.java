@@ -1,6 +1,7 @@
 package ru.personal.scheduler.time.utils;
 
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +17,11 @@ public class TimeUtils {
     public static String formatToHourMinute(Instant instant) {
         return instant.atZone(ZoneId.systemDefault())
                 .format(DateTimeFormatter.ofPattern("HH:mm"));
+    }
+
+    public static long parseSecondsFromHourMinutes(String hourMinutes) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return LocalTime.parse(hourMinutes, formatter).getSecond();
     }
 
     public static Instant localStartOfTheDayTimeStamp(Instant instant) {

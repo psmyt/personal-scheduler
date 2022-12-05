@@ -1,7 +1,9 @@
 package ru.personal.scheduler.view;
 
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -177,6 +179,21 @@ public class ScheduleTable extends StackPane {
         scheduleRoot.getChildren().add(scheduleContents);
         composeTexts(numOfDays, 24, columnWidth, heightOfOneHour);
         scheduleRoot.getChildren().add(scheduleTexts);
+        Button newScheduled = new Button("New Scheduled");
+        newScheduled.setAlignment(Pos.TOP_LEFT);
+        newScheduled.setOnAction(event -> {
+            Stage scheduledItemWindow = new Stage();
+            scheduledItemWindow.setAlwaysOnTop(true);
+            Scene scene = new Scene(new EditWindow(
+                    Scheduled.Builder(Instant.now(), "enter description")
+                            .endDate(Instant.now().plusSeconds(60*60))
+                            .notificationDelivered(false)
+                            .build()
+            ));
+            scheduledItemWindow.setScene(scene);
+            scheduledItemWindow.show();
+        });
+        scheduleRoot.getChildren().add(newScheduled);
         this.getChildren().add(scheduleRoot);
     }
 }
