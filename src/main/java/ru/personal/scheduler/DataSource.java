@@ -32,17 +32,4 @@ public class DataSource {
         }
     }
 
-    public static List<Object> executeSql(String sql, Object... params) {
-        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
-            for (int i = 0; i < params.length; i++) {
-                statement.setObject(i + 1, params[i]);
-            }
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.getMetaData();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-
 }

@@ -1,11 +1,13 @@
 package ru.personal.scheduler.view;
 
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import org.junit.Assert;
@@ -115,6 +117,14 @@ public class ScheduleTable extends StackPane {
                     Tooltip tooltip = new Tooltip(s.toString());
                     tooltip.setShowDelay(Duration.ZERO);
                     Tooltip.install(rectangle, tooltip);
+                    rectangle.onMouseClickedProperty().set(event ->
+                    {
+                        Stage scheduledItemWindow = new Stage();
+                        scheduledItemWindow.setAlwaysOnTop(true);
+                        Scene scene = new Scene(new EditWindow(s));
+                        scheduledItemWindow.setScene(scene);
+                        scheduledItemWindow.show();
+                    });
                     scheduleContents.getChildren().add(rectangle);
                 }
         );
