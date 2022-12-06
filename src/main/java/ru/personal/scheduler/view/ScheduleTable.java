@@ -123,7 +123,7 @@ public class ScheduleTable extends StackPane {
                     {
                         Stage scheduledItemWindow = new Stage();
                         scheduledItemWindow.setAlwaysOnTop(true);
-                        Scene scene = new Scene(new EditWindow(s));
+                        Scene scene = new Scene(new EditingWindow(s));
                         scheduledItemWindow.setScene(scene);
                         scheduledItemWindow.show();
                     });
@@ -184,9 +184,9 @@ public class ScheduleTable extends StackPane {
         newScheduled.setOnAction(event -> {
             Stage scheduledItemWindow = new Stage();
             scheduledItemWindow.setAlwaysOnTop(true);
-            Scene scene = new Scene(new EditWindow(
-                    Scheduled.Builder(Instant.now(), "enter description")
-                            .endDate(Instant.now().plusSeconds(60*60))
+            Scene scene = new Scene(new EditingWindow(
+                    Scheduled.Builder(Instant.now().plusSeconds(60*60), "enter description")
+                            .endDate(Instant.now().plusSeconds(60*60*2))
                             .notificationDelivered(false)
                             .build()
             ));

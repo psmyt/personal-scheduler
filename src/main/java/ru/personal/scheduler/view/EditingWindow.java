@@ -6,24 +6,23 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import ru.personal.scheduler.data.objects.Scheduled;
 import ru.personal.scheduler.time.utils.TimeUtils;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.function.UnaryOperator;
 
-public class EditWindow extends GridPane {
+public class EditingWindow extends GridPane {
 
     Scheduled scheduledItem;
     private TextArea description;
     private DatePicker startDatePicker;
     private TextField startLocalTime;
-    private DatePicker endDatePicker;
     private TextField endLocalTime;
 
-    public EditWindow(Scheduled scheduledItem) {
+    public EditingWindow(Scheduled scheduledItem) {
         this.scheduledItem = scheduledItem;
         this.setAlignment(Pos.CENTER);
         this.setHgap(10);
@@ -37,7 +36,7 @@ public class EditWindow extends GridPane {
         this.add(descriptionText, 1, 0);
         this.description = descriptionText;
 
-        Label startTimeLabel = new Label("Starts at:");
+        Label startTimeLabel = new Label("Date: ");
         this.add(startTimeLabel, 0, 1);
         DatePicker startTimePicker = new DatePicker(
                 LocalDate.ofInstant(
@@ -45,29 +44,26 @@ public class EditWindow extends GridPane {
                         ZoneId.systemDefault()));
         this.add(startTimePicker, 1, 1);
         this.startDatePicker = startTimePicker;
-        TextField startTimeHours = new TextField(TimeUtils.formatToHourMinute(scheduledItem.getStartDate()));
-        this.add(startTimeHours, 2, 1);
+
+        Label startAtLabel = new Label("Starts at: ");
+        this.add(startAtLabel, 0, 2);
+        HourMinuteInputField startTimeHours = new HourMinuteInputField(TimeUtils.formatToHourMinute(scheduledItem.getStartDate()));
+        this.add(startTimeHours, 1, 2);
         this.startLocalTime = startTimeHours;
 
-        Label endTimeLabel = new Label("Ends at:");
-        this.add(endTimeLabel, 0, 2);
-        DatePicker endTimePicker = new DatePicker(
-                LocalDate.ofInstant(
-                        scheduledItem.getEndDate(),
-                        ZoneId.systemDefault()));
-        this.add(endTimePicker, 1, 2);
-        this.endDatePicker = endTimePicker;
-        TextField endTimeHours = new TextField(TimeUtils.formatToHourMinute(scheduledItem.getEndDate()));
-        this.add(endTimeHours, 2, 2);
+        Label endsAtLabel = new Label("Ends at: ");
+        this.add(endsAtLabel, 0, 3);
+        HourMinuteInputField endTimeHours = new HourMinuteInputField(TimeUtils.formatToHourMinute(scheduledItem.getEndDate()));
+        this.add(endTimeHours, 1, 3);
         this.endLocalTime = endTimeHours;
 
         Button saveButton = new Button("Save");
         saveButton.setOnAction(saveButtonAction());
-        this.add(saveButton, 0, 3);
+        this.add(saveButton, 0, 4);
 
         Button deleteButton = new Button("Delete");
         if (scheduledItem.getId() != 0) {
-            this.add(deleteButton, 3, 3);
+            this.add(deleteButton, 2, 4);
             deleteButton.setOnAction( event -> {
                 scheduledItem.delete();
                 ScheduleTable.getInstance().redrawSchedule();
@@ -95,7 +91,7 @@ public class EditWindow extends GridPane {
                         description.getText())
                 .endDate(Instant.from(
                         LocalTime.parse(endLocalTime.getText(), formatter)
-                                .atDate(endDatePicker.getValue())
+                                .atDate(startDatePicker.getValue())
                                 .atZone(ZoneId.systemDefault())
                 ))
                 .notificationDelivered(scheduledItem.isNotificationDelivered())

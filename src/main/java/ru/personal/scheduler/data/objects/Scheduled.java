@@ -2,6 +2,10 @@ package ru.personal.scheduler.data.objects;
 
 import org.junit.Assert;
 import ru.personal.scheduler.DataSource;
+import ru.personal.scheduler.exceptions.DateOrderException;
+import ru.personal.scheduler.exceptions.DescriptionNotFilledException;
+import ru.personal.scheduler.exceptions.ScheduledItemsOverlapException;
+import ru.personal.scheduler.exceptions.StartDateNotInTheFutureException;
 import ru.personal.scheduler.time.utils.Interval;
 
 import java.sql.Connection;
@@ -27,11 +31,31 @@ public class Scheduled {
     private Boolean notificationDelivered;
 
     private Scheduled(Builder builder) {
+        validateNewScheduledItem(builder);
         this.id = builder.id;
         this.startDate = builder.startDate;
         this.endDate = builder.endDate;
         this.description = builder.description;
         this.notificationDelivered = builder.notificationDelivered;
+    }
+
+    private static void validateNewScheduledItem(Builder builder) {
+        try {
+            Assert.assertTrue(builder.startDate.isBefore(builder.endDate));
+        } catch (AssertionError e) {
+            throw new DateOrderException();
+        }
+        try {
+            Assert.assertTrue(builder.startDate.isAfter(Instant.now()));
+        } catch (AssertionError e) {
+            throw new StartDateNotInTheFutureException();
+        }
+        try {
+            Assert.assertNotNull(builder.description);
+            Assert.assertNotEquals(builder.description, "");
+        } catch (AssertionError e) {
+            throw new DescriptionNotFilledException();
+        }
     }
 
     public static List<Scheduled> findWithin(Interval scope) {
@@ -59,9 +83,27 @@ public class Scheduled {
     }
 
     public void persist() {
+        checkNoOverLaps();
         if (this.id == 0) {
             insert();
         } else update();
+    }
+
+    private void checkNoOverLaps() {
+        String sql = "select * from scheduled where end_date > ? and start_date < ?";
+        try (Connection connection = DataSource.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, this.startDate.getEpochSecond());
+            statement.setLong(2, this.endDate.getEpochSecond());
+            ResultSet resultSet = statement.executeQuery();
+            try {
+                Assert.assertFalse(resultSet.next());
+            } catch (AssertionError e) {
+                throw new ScheduledItemsOverlapException();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void insert() {
@@ -73,7 +115,7 @@ public class Scheduled {
             statement.setLong(2, this.endDate.getEpochSecond());
             statement.setString(3, this.description);
             statement.setBoolean(4, this.notificationDelivered);
-            int executionCode = statement.executeUpdate();
+            statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
