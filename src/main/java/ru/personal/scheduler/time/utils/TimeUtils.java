@@ -7,9 +7,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class TimeUtils {
-    public static final int MILLISECONDS_IN_ONE_DAY = 24*60*60*1000;
-    public static final int SECONDS_IN_ONE_DAY = 24*60*60;
+    public static final int MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
+    public static final int SECONDS_IN_ONE_DAY = 24 * 60 * 60;
     public static final int MILLISECONDS_IN_ONE_HOUR = 60 * 60 * 1000;
+
     public static int currentDayOfTheWeek() {
         return Instant.now().atZone(ZoneId.systemDefault()).getDayOfWeek().getValue();
     }

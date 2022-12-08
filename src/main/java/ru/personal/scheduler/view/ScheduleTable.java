@@ -185,8 +185,8 @@ public class ScheduleTable extends StackPane {
             Stage scheduledItemWindow = new Stage();
             scheduledItemWindow.setAlwaysOnTop(true);
             Scene scene = new Scene(new EditingWindow(
-                    Scheduled.Builder(Instant.now().plusSeconds(60*60), "enter description")
-                            .endDate(Instant.now().plusSeconds(60*60*2))
+                    Scheduled.Builder(Instant.now().plusSeconds(60 * 60), "enter description")
+                            .endDate(Instant.now().plusSeconds(60 * 60 * 2))
                             .notificationDelivered(false)
                             .build()
             ));

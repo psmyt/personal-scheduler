@@ -45,10 +45,12 @@ public class Scheduled {
         } catch (AssertionError e) {
             throw new DateOrderException();
         }
-        try {
-            Assert.assertTrue(builder.startDate.isAfter(Instant.now()));
-        } catch (AssertionError e) {
-            throw new StartDateNotInTheFutureException();
+        if (builder.id == 0) {
+            try {
+                Assert.assertTrue(builder.startDate.isAfter(Instant.now()));
+            } catch (AssertionError e) {
+                throw new StartDateNotInTheFutureException();
+            }
         }
         try {
             Assert.assertNotNull(builder.description);
@@ -90,11 +92,12 @@ public class Scheduled {
     }
 
     private void checkNoOverLaps() {
-        String sql = "select * from scheduled where end_date > ? and start_date < ?";
+        String sql = "select * from scheduled where end_date > ? and start_date < ? and id != ?";
         try (Connection connection = DataSource.getConnection();
-        PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, this.startDate.getEpochSecond());
             statement.setLong(2, this.endDate.getEpochSecond());
+            statement.setLong(3, this.id);
             ResultSet resultSet = statement.executeQuery();
             try {
                 Assert.assertFalse(resultSet.next());

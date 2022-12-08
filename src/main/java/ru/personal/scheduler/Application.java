@@ -17,6 +17,7 @@ import ru.personal.scheduler.view.SqlLine;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Application extends javafx.application.Application {
@@ -55,7 +56,7 @@ public class Application extends javafx.application.Application {
             try {
                 throw throwable;
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e.getMessage() + Arrays.toString(e.getStackTrace()));
             }
         }
     }

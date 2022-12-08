@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -12,7 +13,6 @@ import ru.personal.scheduler.time.utils.TimeUtils;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.function.UnaryOperator;
 
 public class EditingWindow extends GridPane {
 
@@ -76,6 +76,7 @@ public class EditingWindow extends GridPane {
         return event -> {
             persistForm();
             ScheduleTable.getInstance().redrawSchedule();
+            ((Stage) (((Node) event.getTarget()).getParent().getScene().getWindow())).close();
         };
     }
 
