@@ -4,21 +4,13 @@ import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import ru.personal.scheduler.data.objects.Scheduled;
 import ru.personal.scheduler.exceptions.BusinessException;
-import ru.personal.scheduler.time.utils.Interval;
-import ru.personal.scheduler.time.utils.TimeUtils;
-import ru.personal.scheduler.view.ScheduleTable;
-import ru.personal.scheduler.view.SqlLine;
+import ru.personal.scheduler.gui.ScheduleTable;
+import ru.personal.scheduler.gui.SqlLine;
 
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class Application extends javafx.application.Application {
 

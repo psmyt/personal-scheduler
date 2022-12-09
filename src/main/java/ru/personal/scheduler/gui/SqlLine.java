@@ -1,4 +1,4 @@
-package ru.personal.scheduler.view;
+package ru.personal.scheduler.gui;
 
 import javafx.scene.Group;
 import javafx.scene.control.TextArea;
