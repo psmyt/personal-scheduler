@@ -8,14 +8,12 @@ import javafx.stage.Stage;
 import ru.personal.scheduler.data.objects.Scheduled;
 import ru.personal.scheduler.time.utils.Interval;
 
-import java.time.Instant;
-
 import static java.time.Instant.now;
 import static ru.personal.scheduler.time.utils.TimeUtils.*;
 
-public class NotificationWindow extends Stage {
+public class NotificationPopup extends Stage {
 
-    public NotificationWindow(Scheduled scheduled) {
+    public NotificationPopup(Scheduled scheduled) {
         Text notificationText = new Text(
                 scheduled.getStartDate().isBefore(now()) ?
                         String.format("Пропущено событие \"%s\" , \n %s часа назад (%s)",
@@ -23,7 +21,7 @@ public class NotificationWindow extends Stage {
                                 (float) Interval.between(scheduled.getStartDate(), now())
                                         .lengthInSeconds() / SECONDS_IN_ONE_HOUR,
                                 printDate(scheduled.getStartDate())) :
-                        String.format("Событие \"%s\" через %s минут",
+                        String.format("Событие \"%s\" начнется через %s минут",
                                 scheduled.getDescription(),
                                 (float) Interval.between(now(), scheduled.getStartDate())
                                         .lengthInSeconds() / 60));

@@ -18,7 +18,7 @@ public class Application extends javafx.application.Application {
     @Override
     public void start(Stage mainStage) {
         NotificationJob notificationJob = new NotificationJob();
-        notificationJob.setPeriod(Duration.seconds(30));
+        notificationJob.setPeriod(Duration.minutes(5));
         notificationJob.start();
         Thread.setDefaultUncaughtExceptionHandler(Application::displayError);
         Stage sql = new Stage();

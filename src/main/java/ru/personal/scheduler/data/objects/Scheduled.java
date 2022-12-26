@@ -208,6 +208,11 @@ public class Scheduled {
         return this.endDate;
     }
 
+    public Scheduled setNotificationDelivered() {
+        this.notificationDelivered = true;
+        return this;
+    }
+
     public static Builder Builder(Instant startDate, String description) {
         return new Builder(startDate, description);
     }
