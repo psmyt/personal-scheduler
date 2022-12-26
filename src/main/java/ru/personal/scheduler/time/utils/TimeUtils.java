@@ -9,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 public class TimeUtils {
     public static final int MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     public static final int SECONDS_IN_ONE_DAY = 24 * 60 * 60;
+    public static final int SECONDS_IN_ONE_HOUR = 60 * 60;
+
     public static final int MILLISECONDS_IN_ONE_HOUR = 60 * 60 * 1000;
 
     public static int currentDayOfTheWeek() {
@@ -18,6 +20,11 @@ public class TimeUtils {
     public static String formatToHourMinute(Instant instant) {
         return instant.atZone(ZoneId.systemDefault())
                 .format(DateTimeFormatter.ofPattern("HH:mm"));
+    }
+
+    public static String printDate(Instant instant) {
+        return instant.atZone(ZoneId.systemDefault())
+                .format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
     }
 
     public static long parseSecondsFromHourMinutes(String hourMinutes) {

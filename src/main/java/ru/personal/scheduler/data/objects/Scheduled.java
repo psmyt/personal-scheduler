@@ -60,27 +60,41 @@ public class Scheduled {
         }
     }
 
+    public static List<Scheduled> thatStartBefore(Instant instant) {
+        String sql = "select * from Scheduled where start_date < ? and notification_delivered = false";
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, instant.getEpochSecond());
+            return produceScheduledList(statement);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static List<Scheduled> findWithin(Interval scope) {
-        List<Scheduled> scheduledList = new ArrayList<>();
         String sql = "select * from Scheduled where start_date > ? and end_date < ?";
         try (Connection connection = DataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, scope.getStartTime().getEpochSecond());
             statement.setLong(2, scope.getEndTime().getEpochSecond());
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                scheduledList.add(
-                        Builder(resultSet.getLong("id"),
-                                Instant.ofEpochSecond(resultSet.getLong("start_date")),
-                                resultSet.getString("description"))
-                                .endDate(Instant.ofEpochSecond(resultSet.getLong("end_date")))
-                                .notificationDelivered(resultSet.getBoolean("notification_delivered"))
-                                .build());
-            }
+            return produceScheduledList(statement);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(scheduledList);
+    }
+
+    private static List<Scheduled> produceScheduledList(PreparedStatement statement) throws SQLException {
+        List<Scheduled> scheduledList = new ArrayList<>();
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            scheduledList.add(
+                    Builder(resultSet.getLong("id"),
+                            Instant.ofEpochSecond(resultSet.getLong("start_date")),
+                            resultSet.getString("description"))
+                            .endDate(Instant.ofEpochSecond(resultSet.getLong("end_date")))
+                            .notificationDelivered(resultSet.getBoolean("notification_delivered"))
+                            .build());
+        }
         return scheduledList;
     }
 

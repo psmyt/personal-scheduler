@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import ru.personal.scheduler.exceptions.BusinessException;
 import ru.personal.scheduler.gui.ScheduleTable;
 import ru.personal.scheduler.gui.SqlLine;
@@ -16,6 +17,9 @@ public class Application extends javafx.application.Application {
 
     @Override
     public void start(Stage mainStage) {
+        NotificationJob notificationJob = new NotificationJob();
+        notificationJob.setPeriod(Duration.seconds(30));
+        notificationJob.start();
         Thread.setDefaultUncaughtExceptionHandler(Application::displayError);
         Stage sql = new Stage();
         Scene sqlScene = new Scene(SqlLine.getInstance());
